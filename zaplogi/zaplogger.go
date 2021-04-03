@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/lohvht/logfeller"
 	"github.com/lohvht/logi/iface"
 )
 
@@ -129,6 +131,37 @@ func NewWithConfig(c LogConfig) (*Logger, error) {
 // initial logger for the package.
 func NewConsole() *Logger {
 	l, _ := NewWithConfig(LogConfig{ConsoleLog: true})
+	return l
+}
+
+// NewDefault creates 2 log files with max backups that rotates every day
+// at 12am.
+func NewDefault(logDir string, backups int, logConsole bool) *Logger {
+	l, _ := NewWithConfig(LogConfig{
+		ConsoleLog: logConsole,
+		LogFileConfigs: []LogFileConfig{
+			{
+				LogRange: [2]Level{InfoLevel, MaxLevel},
+				Writer: &logfeller.File{
+					Filename:         filepath.Join(logDir, "info.log"),
+					When:             "d",
+					RotationSchedule: []string{"0000:00"},
+					Backups:          backups,
+					UseLocal:         true,
+				},
+			},
+			{
+				LogRange: [2]Level{WarnLevel, MaxLevel},
+				Writer: &logfeller.File{
+					Filename:         filepath.Join(logDir, "error.log"),
+					When:             "d",
+					RotationSchedule: []string{"0000:00"},
+					Backups:          backups,
+					UseLocal:         true,
+				},
+			},
+		},
+	})
 	return l
 }
 
