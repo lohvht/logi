@@ -12,6 +12,7 @@ import (
 func ExampleLogConfig_jsonUnmarshal_logfeller() {
 	b := []byte(`{
 		"console_log": true,
+		"root_caller_skip": 1,
 		"log_file_configs": [
 			{
 				"log_range": ["info", "fatal"],
@@ -67,6 +68,7 @@ func ExampleLogConfig_jsonUnmarshal_logfeller() {
 		return
 	}
 	fmt.Println(logConfig.ConsoleLog)
+	fmt.Println(logConfig.RootCallerSkip)
 	for i, rc := range logConfig.LogFileConfigs {
 		fmt.Printf("==================%d of %d==================\n", i+1, len(logConfig.LogFileConfigs))
 		fmt.Println(rc.LoggerName)
@@ -80,6 +82,7 @@ func ExampleLogConfig_jsonUnmarshal_logfeller() {
 	}
 	// Output:
 	// true
+	// 1
 	// ==================1 of 4==================
 	//
 	// [info fatal]
@@ -120,6 +123,7 @@ func ExampleLogConfig_jsonUnmarshal_logfeller() {
 
 func ExampleLogConfig_yamlUnmarshal_logfeller() {
 	b := []byte(`console-log: yes
+root-caller-skip: 1
 log-file-configs:
 - log-range: ['info', 'fatal']
   type: lf
@@ -162,6 +166,7 @@ log-file-configs:
 		return
 	}
 	fmt.Println(logConfig.ConsoleLog)
+	fmt.Println(logConfig.RootCallerSkip)
 	for i, rc := range logConfig.LogFileConfigs {
 		fmt.Printf("==================%d of %d==================\n", i+1, len(logConfig.LogFileConfigs))
 		fmt.Println(rc.LoggerName)
@@ -175,6 +180,7 @@ log-file-configs:
 	}
 	// Output:
 	// true
+	// 1
 	// ==================1 of 4==================
 	//
 	// [info fatal]

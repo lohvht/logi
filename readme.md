@@ -38,6 +38,7 @@ func main() {
     // for "type" would be lumberjack
     jsonConfig := []byte(`{
 		"console_log": true,
+		"root_caller_skip": 1,
 		"log_file_configs": [
 			{
 				"log_range": ["info", "fatal"],

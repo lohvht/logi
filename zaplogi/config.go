@@ -14,7 +14,8 @@ import (
 // LogConfig encapsulates the initialisation of the zap logger
 type LogConfig struct {
 	// ConsoleLog determines if you want to log to the console.
-	ConsoleLog bool `json:"console_log" yaml:"console-log"`
+	ConsoleLog     bool `json:"console_log" yaml:"console-log"`
+	RootCallerSkip int  `json:"root_caller_skip" yaml:"root-caller-skip"`
 	// LogFileConfigs contain the various rotational file configurations
 	LogFileConfigs []LogFileConfig `json:"log_file_configs" yaml:"log-file-configs"`
 }

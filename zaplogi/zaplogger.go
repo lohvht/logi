@@ -51,7 +51,7 @@ func NewWithConfig(c LogConfig) (*Logger, error) {
 	encConf := defaultEncoderConfig()
 	var enc zapcore.Encoder
 	var childCores []zapcore.Core
-	options := []zap.Option{zap.AddCallerSkip(1), zap.AddCaller()}
+	options := []zap.Option{zap.AddCallerSkip(c.RootCallerSkip), zap.AddCaller()}
 	if c.ConsoleLog {
 		enc = zapcore.NewConsoleEncoder(encConf)
 		stdoutPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
@@ -130,7 +130,7 @@ func NewWithConfig(c LogConfig) (*Logger, error) {
 // stderr). NewConsole implement logger.Logger and this logger is the
 // initial logger for the package.
 func NewConsole() *Logger {
-	l, _ := NewWithConfig(LogConfig{ConsoleLog: true})
+	l, _ := NewWithConfig(LogConfig{ConsoleLog: true, RootCallerSkip: 1})
 	return l
 }
 
@@ -138,7 +138,8 @@ func NewConsole() *Logger {
 // at 12am.
 func NewDefault(logDir string, backups int, logConsole bool) *Logger {
 	l, _ := NewWithConfig(LogConfig{
-		ConsoleLog: logConsole,
+		ConsoleLog:     logConsole,
+		RootCallerSkip: 1,
 		LogFileConfigs: []LogFileConfig{
 			{
 				LogRange: [2]Level{InfoLevel, MaxLevel},
@@ -263,12 +264,17 @@ func (l *Logger) Named(loggerName string) iface.Logger {
 	return &Logger{zaplog: newLogger}
 }
 
+func (l *Logger) CallSkip(skips int) iface.Logger {
+	newLogger := l.zaplog.WithOptions(zap.AddCallerSkip(skips))
+	return &Logger{zaplog: newLogger}
+}
+
 // exclusiveCore is a wrapper around zapcore.Core. It takes a list of logger
 // names and check entries depending on the include parameter:
-// - If include==true: check entries if entry's logger name is in the
-// 	 list of logger names passed in
-// 	- else: check entries if entry's logger name is not in the list of logger
-// 	  name passed in
+//   - If include==true: check entries if entry's logger name is in the
+//     list of logger names passed in
+//   - else: check entries if entry's logger name is not in the list of logger
+//     name passed in
 type exclusiveCore struct {
 	loggerNames []string
 	include     bool

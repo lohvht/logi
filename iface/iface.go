@@ -53,4 +53,7 @@ type Logger interface {
 
 	// Named returns a new logger with the given name
 	Named(loggerName string) Logger
+
+	// CallSkip overrides the default underlying callskips settings for the logger implementation
+	CallSkip(skips int) Logger
 }
